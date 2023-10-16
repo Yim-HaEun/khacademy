@@ -1,0 +1,63 @@
+--서울에 위치한 모든 카페 조회:
+SELECT * FROM cafes WHERE c_address LIKE '%서울%';
+--메뉴가 아메리카노가 있는 카페 찾기:
+SELECT c.c_name AS 카페명, m.menu_name AS 메뉴명
+FROM cafes c
+JOIN menu m ON c.cafe_id = m.cafe_id
+WHERE m.menu_name = '아메리카노';
+
+--주말(토요일 OR 일요일)에 운영되는 카페 목록
+SELECT *FROM cafes WHERE operating_hours LIKE '%주말%';
+
+--02를 포함하는 전화번호를 가지는 서울의 카페 찾기 :
+SELECT * FROM cafes WHERE phone_number LIKE '%02%';
+
+--이름에 라떼가 포함된 카페 찾기
+SELECT * FROM cafes WHERE c_name LIKE '%라떼%';
+
+--4.00 미만의 가격을 가진 메뉴 항목 찾기
+SELECT * FROM menu WHERE price < 4.00;
+
+--매일 운영되는 카페 찾기
+SELECT * FROM cafes WHERE operating_hours LIKE '%매일%';
+
+--매일 운영되고 가격이 4.00 미만의 가격을 가진 카페 찾기
+SELECT * FROM cafes c
+JOIN menu m ON c.cafe_id = m.cafe_id
+WHERE operating_hours LIKE '%매일%' AND price <4.00;
+
+--대 라는 이름을 가진 카페 찾기
+SELECT * FROM cafes WHERE c_name LIKE '%대%';
+
+--모든 카페의 메뉴 항목 수 계산:
+SELECT c_name,COUNT(menu_name) AS COUNT_MENU 
+FROM cafes c 
+JOIN menu m ON c.cafe_id = m.cafe_id
+GROUP BY c_name;
+
+--메뉴 설명에 '커피'가 포함된 카페 찾기:
+SELECT * FROM cafes c JOIN menu m ON c.cafe_id = m.cafe_id
+WHERE description LIKE '%커피%';
+
+--각 카페별 모든 메뉴 항목의 총 가격 계산:
+SELECT c_name,SUM(price) FROM cafes c JOIN menu m ON c.cafe_id = m.cafe_id
+GROUP BY c_name;
+
+
+--'초코'이 설명에 포함된 메뉴 항목이 있는 카페 선택:
+SELECT * FROM cafes c JOIN menu m ON c.cafe_id = m.cafe_id
+WHERE description LIKE '%초코%';
+
+--외래키 제약 조건 추가
+ALTER TABLE orders ADD CONSTRAINT fk_orders_cafe FOREIGN KEY(cafe_id)REFERENCES cafes(cafe_id);
+ALTER TABLE orders ADD CONSTRAINT fk_orders_cafe FOREIGN KEY(menu_id) REFERENCES menu(menu_id);
+
+--테이블 코멘트 추가
+COMMENT ON TABLE orders IS '주문 정보를 저장하는 테이블';
+
+2개 JOIN하는 법
+--주문 번호o.order_id 카페이름c.c_name as CAFE_NAME 메뉴이름m.menu_name 메뉴가격m.price 총수량o.quantity 총금액o.total_price
+SELECT  o.order_id,c.c_name AS CAFE_NAME, m.menu_name, m.price,o.quantity,o.total_price
+FROM orders o JOIN cafes c ON o.cafe_id = c.cafe_id
+JOIN menu m ON o.menu_id = m.menu_id
+WHERE o.order_id =1;
